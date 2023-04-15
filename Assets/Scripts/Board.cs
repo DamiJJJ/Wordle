@@ -2,15 +2,19 @@ using UnityEngine;
 
 public class Board : MonoBehaviour
 {
-    private static readonly KeyCode[] SUPPORTED_KEYS = new KeyCode[] {
-            KeyCode.A, KeyCode.B, KeyCode.C, KeyCode.D, KeyCode.E, KeyCode.F, 
-            KeyCode.G, KeyCode.H, KeyCode.I, KeyCode.J, KeyCode.K, KeyCode.L, 
-            KeyCode.M, KeyCode.N, KeyCode.O, KeyCode.P, KeyCode.Q, KeyCode.R, 
-            KeyCode.S, KeyCode.T, KeyCode.U, KeyCode.V, KeyCode.W, KeyCode.X, 
-            KeyCode.Y, KeyCode.Z
-        };
+    private static readonly KeyCode[] SUPPORTED_KEYS = new KeyCode[]
+    {
+        KeyCode.A, KeyCode.B, KeyCode.C, KeyCode.D, KeyCode.E, KeyCode.F, 
+        KeyCode.G, KeyCode.H, KeyCode.I, KeyCode.J, KeyCode.K, KeyCode.L, 
+        KeyCode.M, KeyCode.N, KeyCode.O, KeyCode.P, KeyCode.Q, KeyCode.R, 
+        KeyCode.S, KeyCode.T, KeyCode.U, KeyCode.V, KeyCode.W, KeyCode.X, 
+        KeyCode.Y, KeyCode.Z
+    };
 
-        private Row[] rows;
+    private Row[] rows;
+
+    private string[] solutions;
+    private string[] validWords;
 
     private int rowIndex;
     private int columnIndex;
@@ -18,6 +22,20 @@ public class Board : MonoBehaviour
     private void Awake()
     {
         rows = GetComponentsInChildren<Row>();
+    }
+
+    private void Start()
+    {
+        LoadData();
+    }
+
+    private void LoadData()
+    {
+        TextAsset textFile = Resources.Load("official_wordle_all") as TextAsset;
+        validWords = textFile.text.Split('\n');
+
+        textFile = Resources.Load("official_wordle_common") as TextAsset;
+        solutions = textFile.text.Split('\n');
     }
     private void Update()
     {
@@ -30,7 +48,10 @@ public class Board : MonoBehaviour
         }
         else if (columnIndex >= currentRow.tiles.Length)
         {
-            //TODO submit row
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                SubmitRow(currentRow);
+            }
         }
         else
         {
@@ -44,6 +65,10 @@ public class Board : MonoBehaviour
                 }
             }
         }
- 
+    }
+
+    private void SubmitRow(Row row)
+    {
+        // TODO
     }
 }
