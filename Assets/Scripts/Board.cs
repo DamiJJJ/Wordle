@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class Board : MonoBehaviour
@@ -31,6 +32,9 @@ public class Board : MonoBehaviour
 
     [Header("UI")]
     public TextMeshProUGUI invalidWordText;
+    public TextMeshProUGUI tipWord;
+    public Button newWordButton;
+    public Button tryAgainButton;
 
     private void Awake()
     {
@@ -40,9 +44,22 @@ public class Board : MonoBehaviour
     private void Start()
     {
         LoadData();
-        SetRandomWord();
+        NewGame();
     }
 
+    public void NewGame()
+    {
+        ClearBoard();
+        SetRandomWord();
+
+        enabled = true;
+    }
+
+    public void TryAgain()
+    {
+        ClearBoard();
+        enabled = true;
+    }
     private void LoadData()
     {
         TextAsset textFile = Resources.Load("official_wordle_all") as TextAsset;
@@ -56,6 +73,7 @@ public class Board : MonoBehaviour
     {
         word = solutions[Random.Range(0, solutions.Length)];
         word = word.ToLower().Trim();
+        tipWord.text = word;
     }
     private void Update()
     {
@@ -138,6 +156,11 @@ public class Board : MonoBehaviour
             }
         }
 
+        if (HasWon(row))
+        {
+            enabled = false;
+        }
+
         rowIndex++;
         columnIndex = 0;
 
@@ -145,6 +168,21 @@ public class Board : MonoBehaviour
         {
             enabled = false;
         }
+    }
+
+    private void ClearBoard()
+    {
+        for (int row = 0; row < rows.Length; row++)
+        {
+            for (int col =0; col < rows[row].tiles.Length; col++)
+            {
+                rows[row].tiles[col].SetLetter('\0');
+                rows[row].tiles[col].SetState(emptyState);
+            }
+        }
+
+        rowIndex = 0;
+        columnIndex = 0;
     }
 
     private bool isValidWord(string word)
@@ -158,5 +196,29 @@ public class Board : MonoBehaviour
         }
 
         return false;
+    }
+
+    private bool HasWon(Row row)
+    {
+        for (int i = 0; i < row.tiles.Length; i++)
+        {
+            if (row.tiles[i].state != correctState)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void OnEnable()
+    {
+        tryAgainButton.gameObject.SetActive(false);
+        newWordButton.gameObject.SetActive(false);
+    }
+
+    private void OnDisable()
+    {
+        tryAgainButton.gameObject.SetActive(true);
+        newWordButton.gameObject.SetActive(true);
     }
 }
